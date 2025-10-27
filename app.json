@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Sudoku-Mobile",
-    "slug": "Sudoku-Mobile",
+    "name": "Sudoku - Klasik Bulmaca",
+    "slug": "sudoku-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,20 +10,30 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#3B82F6"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aliee.sudoku"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#3B82F6"
       },
+      "package": "com.aliee.sudoku",
+      "versionCode": 1,
+      "permissions": [],
       "edgeToEdgeEnabled": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6801e1ce-43d3-4a81-aeab-f4ede5300573"
+      }
+    },
+    "owner": "aliee.dev"
   }
 }

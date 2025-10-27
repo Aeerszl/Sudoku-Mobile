@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StatusBar, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StatusBar, Image, StyleSheet } from 'react-native';
 import { loadGame, loadStats } from '../services/gameStorage';
 import { DIFFICULTY } from '../utils/constants';
 
@@ -34,9 +34,10 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.emoji}>🎮</Text>
+          {/* Oyun konsolu emojisi */}
+          <Text style={styles.gameIcon}>🎮</Text>
           <Text style={styles.title}>Sudoku</Text>
           <Text style={styles.subtitle}>Zihin Oyunu</Text>
         </View>
@@ -69,10 +70,6 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.linkText}>Detayları gör →</Text>
           </TouchableOpacity>
         )}
-
-        <TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate('Settings')} activeOpacity={0.8}>
-          <Text style={styles.settingsButtonText}>⚙️ Ayarlar</Text>
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -103,14 +100,57 @@ function StatItem({ label, value }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#3B82F6' },
-  scrollView: { flex: 1, padding: 24 },
-  header: { alignItems: 'center', marginTop: 48, marginBottom: 32 },
-  emoji: { fontSize: 60, marginBottom: 8 },
-  title: { fontSize: 36, fontWeight: 'bold', color: '#FFFFFF' },
-  subtitle: { color: '#FFFFFF', opacity: 0.8, marginTop: 8 },
-  continueButton: { backgroundColor: '#10B981', borderRadius: 16, padding: 20, marginBottom: 16 },
+  scrollView: { flex: 1 },
+  scrollContent: { 
+    padding: 24, 
+    paddingBottom: 80, // Alt tarafta boşluk (telefon tuşları için)
+  },
+  header: { alignItems: 'center', marginTop: 16, marginBottom: 32 },
+  gameIcon: { 
+    fontSize: 72, 
+    marginBottom: 12,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  title: { 
+    fontSize: 42, 
+    fontWeight: 'bold', 
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  subtitle: { 
+    color: '#FFFFFF', 
+    opacity: 0.9, 
+    marginTop: 8,
+    fontSize: 16,
+    letterSpacing: 1,
+  },
+  continueButton: { 
+    backgroundColor: '#10B981', 
+    borderRadius: 16, 
+    padding: 20, 
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
   continueButtonText: { color: '#FFFFFF', fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
-  card: { backgroundColor: '#FFFFFF', borderRadius: 24, padding: 24, marginBottom: 24 },
+  card: { 
+    backgroundColor: '#FFFFFF', 
+    borderRadius: 24, 
+    padding: 24, 
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
+  },
   cardTitle: { fontSize: 24, fontWeight: 'bold', color: '#1F2937', marginBottom: 16 },
   difficultyButton: { borderRadius: 12, padding: 16, marginBottom: 12 },
   difficultyContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
@@ -123,6 +163,4 @@ const styles = StyleSheet.create({
   statValue: { fontSize: 24, fontWeight: 'bold', color: '#3B82F6' },
   statLabel: { color: '#6B7280', fontSize: 12 },
   linkText: { color: '#3B82F6', textAlign: 'center', marginTop: 12 },
-  settingsButton: { backgroundColor: '#FFFFFF', borderRadius: 16, padding: 20, marginBottom: 24 },
-  settingsButtonText: { color: '#1F2937', fontSize: 18, fontWeight: '600', textAlign: 'center' },
 });

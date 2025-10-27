@@ -27,16 +27,16 @@ export default function SudokuGrid({ game, selectedCell, onCellPress }) {
       cellStyles.push(styles.cellFixed);
     }
 
-    // Border stilleri
-    if (col % 3 === 2 && col !== 8) cellStyles.push(styles.borderRightThick);
-    if (row % 3 === 2 && row !== 8) cellStyles.push(styles.borderBottomThick);
-    if (col !== 8) cellStyles.push(styles.borderRight);
-    if (row !== 8) cellStyles.push(styles.borderBottom);
-
     return (
       <TouchableOpacity
         key={`${row}-${col}`}
-        style={[cellStyles, { width: cellSize, height: cellSize }]}
+        style={[
+          cellStyles, 
+          { 
+            width: cellSize, 
+            height: cellSize,
+          }
+        ]}
         onPress={() => onCellPress(row, col)}
         activeOpacity={0.6}
       >
@@ -67,26 +67,83 @@ export default function SudokuGrid({ game, selectedCell, onCellPress }) {
   };
 
   return (
-    <View style={[styles.grid, { width: gridSize, height: gridSize }]}>
-      {Array.from({ length: GRID_SIZE }).map((_, row) => (
-        <View key={row} style={styles.row}>
-          {Array.from({ length: GRID_SIZE }).map((_, col) => 
-            renderCell(row, col)
-          )}
-        </View>
-      ))}
+    <View style={[styles.gridContainer, { width: gridSize, height: gridSize }]}>
+      {/* Grid çizgileri */}
+      <View style={styles.gridLines}>
+        {/* Yatay çizgiler - 10 tane (0-9) */}
+        {Array.from({ length: 10 }).map((_, i) => (
+          <View
+            key={`h-${i}`}
+            style={[
+              styles.horizontalLine,
+              {
+                top: i * (gridSize / 9),
+                width: gridSize,
+                height: (i % 3 === 0) ? 2 : 0.5, // 0, 3, 6, 9 kalın
+              }
+            ]}
+          />
+        ))}
+        
+        {/* Dikey çizgiler - 10 tane (0-9) */}
+        {Array.from({ length: 10 }).map((_, i) => (
+          <View
+            key={`v-${i}`}
+            style={[
+              styles.verticalLine,
+              {
+                left: i * (gridSize / 9),
+                height: gridSize,
+                width: (i % 3 === 0) ? 2 : 0.5, // 0, 3, 6, 9 kalın
+              }
+            ]}
+          />
+        ))}
+      </View>
+      
+      {/* Hücreler */}
+      <View style={styles.grid}>
+        {Array.from({ length: GRID_SIZE }).map((_, row) => (
+          <View key={row} style={styles.row}>
+            {Array.from({ length: GRID_SIZE }).map((_, col) => 
+              renderCell(row, col)
+            )}
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  grid: {
-    backgroundColor: '#FFFFFF',
+  gridContainer: {
+    position: 'relative',
+    backgroundColor: '#FFF',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
+  },
+  gridLines: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10,
+    pointerEvents: 'none',
+  },
+  horizontalLine: {
+    position: 'absolute',
+    backgroundColor: '#000',
+  },
+  verticalLine: {
+    position: 'absolute',
+    backgroundColor: '#000',
+  },
+  grid: {
+    flex: 1,
   },
   row: {
     flexDirection: 'row',
@@ -104,22 +161,6 @@ const styles = StyleSheet.create({
   },
   cellFixed: {
     backgroundColor: '#F9FAFB',
-  },
-  borderRight: {
-    borderRightWidth: 1,
-    borderRightColor: '#D1D5DB',
-  },
-  borderBottom: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#D1D5DB',
-  },
-  borderRightThick: {
-    borderRightWidth: 2,
-    borderRightColor: '#1F2937',
-  },
-  borderBottomThick: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#1F2937',
   },
   cellValue: {
     fontSize: 20,

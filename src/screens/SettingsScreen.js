@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet } from 'react-native';
 import { loadSettings, saveSettings, clearAllData } from '../services/gameStorage';
+import { soundService } from '../services/soundService';
+import { hapticService } from '../services/hapticService';
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ navigation }) {
   const [settings, setSettings] = useState({
     theme: 'light',
     soundEnabled: true,
@@ -15,7 +17,12 @@ export default function SettingsScreen() {
   useEffect(() => {
     const load = async () => {
       const s = await loadSettings();
-      if (s) setSettings(s);
+      if (s) {
+        setSettings(s);
+        // Ses ve titreşim ayarını uygula
+        soundService.setEnabled(s.soundEnabled !== false);
+        hapticService.setEnabled(s.hapticEnabled !== false);
+      }
     };
     load();
   }, []);
@@ -24,6 +31,22 @@ export default function SettingsScreen() {
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
     await saveSettings(newSettings);
+    
+    // Ses ayarı değiştiğinde soundService'i güncelle
+    if (key === 'soundEnabled') {
+      soundService.setEnabled(value);
+      console.log(`🔊 Ses ayarı değişti: ${value ? 'AÇIK' : 'KAPALI'}`);
+    }
+    
+    // Titreşim ayarı değiştiğinde hapticService'i güncelle
+    if (key === 'hapticEnabled') {
+      hapticService.setEnabled(value);
+      console.log(`📳 Titreşim ayarı değişti: ${value ? 'AÇIK' : 'KAPALI'}`);
+      // Test titreşimi
+      if (value) {
+        hapticService.medium();
+      }
+    }
   };
 
   const reset = () => {
@@ -49,9 +72,13 @@ export default function SettingsScreen() {
       </View>
 
       <View style={s.card}>
-        <Text style={s.title}>⚠️ Tehlikeli Bölge</Text>
-        <TouchableOpacity style={s.resetBtn} onPress={reset}>
-          <Text style={s.resetBtnText}>Tüm Verileri Sıfırla</Text>
+        <Text style={s.title}>📊 Diğer</Text>
+        <TouchableOpacity 
+          style={s.menuBtn} 
+          onPress={() => navigation.navigate('Stats')}
+        >
+          <Text style={s.menuBtnText}>📈 İstatistiklerim</Text>
+          <Text style={s.menuBtnArrow}>›</Text>
         </TouchableOpacity>
       </View>
 
@@ -83,8 +110,23 @@ const s = StyleSheet.create({
   itemText: { flex: 1, marginRight: 16 },
   itemLabel: { fontWeight: '600', marginBottom: 4 },
   itemDesc: { fontSize: 12, color: '#6B7280' },
-  resetBtn: { backgroundColor: '#EF4444', borderRadius: 12, padding: 16 },
-  resetBtnText: { color: '#FFF', fontWeight: 'bold', textAlign: 'center' },
+  menuBtn: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+  },
+  menuBtnText: { 
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  menuBtnArrow: {
+    fontSize: 24,
+    color: '#9CA3AF',
+  },
   footer: { marginTop: 32, marginBottom: 16, alignItems: 'center' },
   footerText: { color: '#9CA3AF', fontSize: 12 },
   footerSubtext: { color: '#9CA3AF', fontSize: 10, marginTop: 4 },

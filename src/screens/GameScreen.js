@@ -6,6 +6,7 @@ import NumberPad from '../components/NumberPad';
 import Timer from '../components/Timer';
 import { saveStats, loadStats } from '../services/gameStorage';
 import { UserStats } from '../models/UserStats';
+import { MAX_MISTAKES, HINT_LIMITS } from '../utils/constants';
 
 export default function GameScreen({ route, navigation }) {
   const { difficulty = 'medium', isNew = true } = route.params || {};
@@ -30,14 +31,23 @@ export default function GameScreen({ route, navigation }) {
   useEffect(() => {
     if (game && game.isCompleted) {
       const complete = async () => {
-        const stats = await loadStats();
-        const userStats = UserStats.fromJSON(stats);
-        userStats.completeGame(game.difficulty, game.timeSpent);
-        await saveStats(userStats.toJSON());
-        Alert.alert('🎉 Tebrikler!', `Süre: ${Math.floor(game.timeSpent / 60)}:${(game.timeSpent % 60).toString().padStart(2, '0')}\nHatalar: ${game.mistakes}`, [
-          { text: 'Yeni Oyun', onPress: () => startNewGame(difficulty) },
-          { text: 'Ana Menü', onPress: () => navigation.goBack() }
-        ]);
+        // Hata limiti aşıldı mı kontrol et
+        if (game.mistakes >= MAX_MISTAKES) {
+          Alert.alert('😢 Oyun Bitti!', `Hata limitini aştınız!\nToplam Hata: ${game.mistakes}/${MAX_MISTAKES}`, [
+            { text: 'Yeni Oyun', onPress: () => startNewGame(difficulty) },
+            { text: 'Ana Menü', onPress: () => navigation.goBack() }
+          ]);
+        } else {
+          // Başarıyla tamamlandı
+          const stats = await loadStats();
+          const userStats = UserStats.fromJSON(stats);
+          userStats.completeGame(game.difficulty, game.timeSpent);
+          await saveStats(userStats.toJSON());
+          Alert.alert('🎉 Tebrikler!', `Süre: ${Math.floor(game.timeSpent / 60)}:${(game.timeSpent % 60).toString().padStart(2, '0')}\nHatalar: ${game.mistakes}/${MAX_MISTAKES}`, [
+            { text: 'Yeni Oyun', onPress: () => startNewGame(difficulty) },
+            { text: 'Ana Menü', onPress: () => navigation.goBack() }
+          ]);
+        }
       };
       complete();
     }
@@ -47,13 +57,21 @@ export default function GameScreen({ route, navigation }) {
     return <View style={s.loading}><ActivityIndicator size="large" color="#3B82F6" /><Text style={s.loadingText}>Yükleniyor...</Text></View>;
   }
 
+  const hintLimit = HINT_LIMITS[game.difficulty] || 3;
+  const hintsRemaining = hintLimit - game.hintsUsed;
+
   return (
     <View style={s.container}>
       <View style={s.topBar}>
         <View style={s.row}>
           <Timer timeSpent={game.timeSpent} isPaused={game.isPaused} />
           <View style={s.info}><Text style={s.label}>Zorluk</Text><Text style={s.value}>{difficulty}</Text></View>
-          <View style={s.info}><Text style={s.label}>Hatalar</Text><Text style={[s.value, { color: '#EF4444' }]}>{game.mistakes}</Text></View>
+          <View style={s.info}>
+            <Text style={s.label}>Hatalar</Text>
+            <Text style={[s.value, { color: game.mistakes >= MAX_MISTAKES - 1 ? '#EF4444' : '#6B7280' }]}>
+              {game.mistakes}/{MAX_MISTAKES}
+            </Text>
+          </View>
           <TouchableOpacity style={s.pauseBtn} onPress={togglePause}><Text style={s.pauseBtnText}>{game.isPaused ? '▶️' : '⏸️'}</Text></TouchableOpacity>
         </View>
       </View>
@@ -75,12 +93,22 @@ export default function GameScreen({ route, navigation }) {
       <View style={s.controls}>
         <View style={s.actionRow}>
           {[
-            { icon: '💡', label: 'İpucu', onPress: useHint },
+            { icon: '💡', label: `İpucu (${hintsRemaining})`, onPress: useHint, disabled: hintsRemaining <= 0 },
             { icon: '🗑️', label: 'Sil', onPress: clearCell },
             { icon: isNoteMode ? '✏️' : '📝', label: 'Not', onPress: () => setIsNoteMode(!isNoteMode), active: isNoteMode },
             { icon: '🔄', label: 'Yeni', onPress: () => Alert.alert('Yeni Oyun', 'Devam?', [{ text: 'Hayır' }, { text: 'Evet', onPress: () => startNewGame(difficulty) }]) }
           ].map((btn, i) => (
-            <TouchableOpacity key={i} style={[s.actionBtn, selectedCell.row === null && i < 2 && s.actionBtnDis, btn.active && s.actionBtnActive]} onPress={btn.onPress} disabled={selectedCell.row === null && i < 2}>
+            <TouchableOpacity 
+              key={i} 
+              style={[
+                s.actionBtn, 
+                (selectedCell.row === null && i === 1) && s.actionBtnDis,
+                btn.disabled && s.actionBtnDis,
+                btn.active && s.actionBtnActive
+              ]} 
+              onPress={btn.onPress} 
+              disabled={(selectedCell.row === null && i === 1) || btn.disabled}
+            >
               <Text style={s.actionIcon}>{btn.icon}</Text>
               <Text style={s.actionLabel}>{btn.label}</Text>
             </TouchableOpacity>

@@ -74,6 +74,40 @@ export class Game {
   }
 
   /**
+   * İpucu al - boş rastgele bir hücreye doğru sayıyı yerleştir
+   */
+  useHint() {
+    // Boş hücreleri bul
+    const emptyCells = [];
+    for (let i = 0; i < 9; i++) {
+      for (let j = 0; j < 9; j++) {
+        if (this.currentGrid[i][j] === 0 && this.puzzle[i][j] === 0) {
+          emptyCells.push({ row: i, col: j });
+        }
+      }
+    }
+
+    if (emptyCells.length === 0) {
+      return null; // Tüm hücreler dolu
+    }
+
+    // Rastgele bir boş hücre seç
+    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+    const { row, col } = emptyCells[randomIndex];
+
+    // Doğru sayıyı yerleştir
+    this.currentGrid[row][col] = this.solution[row][col];
+    
+    // Notları temizle
+    this.notes[row][col] = [];
+    
+    // İpucu sayacını artır
+    this.hintsUsed++;
+
+    return { row, col, value: this.solution[row][col] };
+  }
+
+  /**
    * Oyunun tamamlanıp tamamlanmadığını kontrol et
    */
   checkCompletion() {

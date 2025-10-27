@@ -1,6 +1,7 @@
 // Oyun sabitleri
 export const GRID_SIZE = 9;
 export const BOX_SIZE = 3;
+export const MAX_MISTAKES = 3; // Maksimum hata hakkı
 
 // Zorluk seviyeleri
 export const DIFFICULTY = {
@@ -16,6 +17,14 @@ export const DIFFICULTY_HOLES = {
   [DIFFICULTY.MEDIUM]: 45,
   [DIFFICULTY.HARD]: 52,
   [DIFFICULTY.EXPERT]: 58
+};
+
+// Her zorluk seviyesi için ipucu limiti
+export const HINT_LIMITS = {
+  [DIFFICULTY.EASY]: 5,
+  [DIFFICULTY.MEDIUM]: 3,
+  [DIFFICULTY.HARD]: 2,
+  [DIFFICULTY.EXPERT]: 1
 };
 
 // Renkler

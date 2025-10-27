@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -22,13 +23,38 @@ export default function AppNavigator() {
           headerTintColor: '#fff',
           headerTitleStyle: {
             fontWeight: 'bold',
+            fontSize: 20,
           },
+          headerTitleAlign: 'center', // Logoyu merkeze al
         }}
       >
         <Stack.Screen 
           name="Home" 
           component={HomeScreen}
-          options={{ title: 'Sudoku' }}
+          options={({ navigation }) => ({
+            headerTitle: () => (
+              <View style={styles.headerCenterContainer}>
+                <Image 
+                  source={require('../../assets/alieelogo.png')} 
+                  style={styles.headerLogo}
+                  resizeMode="contain"
+                />
+              </View>
+            ),
+            headerLeft: () => (
+              <View style={styles.headerLeftContainer}>
+                <Text style={styles.headerLeftText}>Sudoku</Text>
+              </View>
+            ),
+            headerRight: () => (
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('Settings')}
+                style={styles.headerIcon}
+              >
+                <Text style={styles.settingsIcon}>⚙️</Text>
+              </TouchableOpacity>
+            ),
+          })}
         />
         <Stack.Screen 
           name="Game" 
@@ -49,3 +75,28 @@ export default function AppNavigator() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  headerCenterContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerLogo: {
+    width: 100,
+    height: 100,
+  },
+  headerLeftContainer: {
+    marginLeft: 4,
+  },
+  headerLeftText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  headerIcon: {
+    padding: 8,
+  },
+  settingsIcon: {
+    fontSize: 28,
+  },
+});
